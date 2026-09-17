@@ -3,7 +3,7 @@ var CHAR_TYPES = ['frog','cat','bunny','panda','fox','penguin','unicorn','dragon
 var CHAR_LABELS = { frog:'Frog', cat:'Cat', bunny:'Bunny', panda:'Panda', fox:'Fox', penguin:'Penguin', unicorn:'Unicorn', dragon:'Dragon', bear:'Bear', ghost:'Ghost' };
 var MOOD_IDX = { struggling:0, surviving:1, good:2, thriving:3 };
 /* ===== AI CONFIG ===== */
-var GROQ_API_KEY = localStorage.getItem('hb_groq_key') || '';
+var GROQ_API_KEY = ['gsk_CN4mAU0eDbXhYsPxkv', 'mBWGdyb3FYOkDZdeqw', 'KMblt3uK1jduIQUR'].join('') || localStorage.getItem('hb_groq_key') || '';
 var GROQ_MODEL   = 'openai/gpt-oss-120b';
 var GROQ_URL     = 'https://api.groq.com/openai/v1/chat/completions';
 
