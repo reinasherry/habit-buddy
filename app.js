@@ -379,7 +379,59 @@ var chatHistory = JSON.parse(localStorage.getItem('hb_chat') || '[]');
 var chatBusy = false;
 var currentMsg = '';
 var typewriterTimer = null; // FIX #10: track timer for cleanup
+/* ===== NOTIFICATIONS ===== */
+function requestNotifPermission() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') {
+    setTimeout(function() {
+      Notification.requestPermission().then(function(perm) {
+        if (perm === 'granted') {
+          showToast('Reminders on! ' + (charName || 'Your buddy') + ' will nag you. 🔔');
+        }
+      });
+    }, 4000);
+  }
+}
 
+function createNotificationChannel() {
+  // no-op on web, only used in native builds
+  return;
+}
+
+function startReminderLoop() {
+  // no-op on web
+  return;
+}
+
+function checkReminders() {
+  // no-op on web
+  return;
+}
+
+function checkForPokes() {
+  // no-op on web
+  return;
+}
+
+function openPartnerView() {
+  return false;
+}
+
+function cleanupOldFiredFlags() {
+  var today = dateKey();
+  for (var i = 0; i < localStorage.length; i++) {
+    var key = localStorage.key(i);
+    if (key && key.indexOf('hb_fired_') === 0 && key.indexOf(today) < 0) {
+      localStorage.removeItem(key);
+      i--;
+    }
+  }
+}
+
+function scheduleNativeReminders() {
+  // no-op on web
+  return;
+}
 function save() {
   localStorage.setItem('hb_habits', JSON.stringify(habits));
   localStorage.setItem('hb_xp', xp);
