@@ -414,7 +414,79 @@ function checkForPokes() {
 }
 
 function openPartnerView() {
-  return false;
+  var params = new URLSearchParams(location.search);
+  var payload = params.get('partner');
+  if (!payload) return false;
+
+  var content = document.getElementById('partnerContent');
+  var screen = document.getElementById('partnerScreen');
+  if (!content || !screen) return false;
+
+  // Decode the partner payload
+  var data = null;
+  try {
+    var b64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4) b64 += '=';
+    var json = decodeURIComponent(escape(atob(b64)));
+    data = JSON.parse(json);
+  } catch (e) {
+    content.innerHTML =
+      '<div class="partner-done">' +
+        '<div class="pd-emoji">😵</div>' +
+        '<h3>Invalid link</h3>' +
+        '<p>This partner link is broken or expired.</p>' +
+      '</div>';
+    screen.classList.remove('hidden');
+    return true;
+  }
+
+  renderPartnerView(content, data);
+  screen.classList.remove('hidden');
+  return true;
+}
+
+function renderPartnerView(el, data) {
+  var mood = moodFor(data.p || 0);
+  var todayHabits = data.h || [];
+  var doneCount = todayHabits.filter(function(h) { return h.c >= h.g; }).length;
+  var totalCount = todayHabits.length;
+
+  var html = '';
+  html += '<div class="partner-header">';
+  html += '<div class="ph-badge">👀 Partner View</div>';
+  html += '<h2>You\'re watching ' + escapeHtml(data.n || 'Buddy') + '</h2>';
+  html += '<p>Last updated: ' + escapeHtml(data.m || 'unknown') + '</p>';
+  html += '</div>';
+
+  html += '<div class="partner-hero" style="background:' + moodBg(mood) + '">';
+  html += '<div class="ph-face">' + characterSVG(data.t || 'frog', mood) + '</div>';
+  html += '<div class="ph-name">' + escapeHtml(data.n || 'Buddy') + '</div>';
+  html += '<div class="ph-status">' + statusLabel(data.p || 0) + '</div>';
+  html += '</div>';
+
+  html += '<div class="partner-stats">';
+  html += '<div class="partner-stat"><div class="ps-num">🔥 ' + (data.s || 0) + '</div><div class="ps-lbl">Streak</div></div>';
+  html += '<div class="partner-stat"><div class="ps-num">' + (data.p || 0) + '%</div><div class="ps-lbl">Today</div></div>';
+  html += '<div class="partner-stat"><div class="ps-num">' + doneCount + '/' + totalCount + '</div><div class="ps-lbl">Done</div></div>';
+  html += '</div>';
+
+  html += '<button class="poke-btn" id="pokeBtn" onclick="sendPoke()">👉 Send a poke</button>';
+
+  el.innerHTML = html;
+}
+
+function sendPoke() {
+  var btn = document.getElementById('pokeBtn');
+  if (!btn || btn.classList.contains('poked')) return;
+
+  btn.classList.add('poked');
+  btn.textContent = '✅ Poke sent!';
+  soundYay();
+  if (navigator.vibrate) navigator.vibrate([30, 40, 30]);
+  setTimeout(function() {
+    showToast('Poke sent. They\'ll feel it. Probably. 👉');
+  }, 200);
+  confetti(30);
 }
 
 function cleanupOldFiredFlags() {
